@@ -13,6 +13,7 @@ public class PlayerColor {
 public class Player {
 	public Image panel;
 	public Text text;
+	public Button button;
 }
 
 public class GameController : MonoBehaviour {
@@ -26,6 +27,7 @@ public class GameController : MonoBehaviour {
 	public Player playerO;
 	public PlayerColor activePlayerColor;
 	public PlayerColor inactivePlayerColor;
+	public GameObject startInfo;
 
 	private string playerSide;
 	private int moveCount;
@@ -35,9 +37,7 @@ public class GameController : MonoBehaviour {
 		moveCount = 0;
 		gameOverPanel.SetActive(false);
 		SetGameControllerReferenceOnButtons();
-		playerSide = "X";
 		restartButton.SetActive(false);
-		SetPlayerColors(playerX, playerO);
 	}
 
 	void SetGameControllerReferenceOnButtons ()
@@ -51,6 +51,21 @@ public class GameController : MonoBehaviour {
 	public string GetPlayerSide ()
 	{
 		return playerSide;
+	}
+
+	public void SetStartingSide (string startingSide)
+	{
+		playerSide = startingSide;
+		if (playerSide == "X")
+		{
+			SetPlayerColors(playerX, playerO);
+		} 
+		else
+		{
+			SetPlayerColors(playerO, playerX);
+		}
+
+		StartGame ();
 	}
 
 	public void EndTurn ()
@@ -103,6 +118,7 @@ public class GameController : MonoBehaviour {
 	void GameOver (string winningPlayer)
 	{
 		if (winningPlayer == "draw") {
+			SetPlayerColorsInactive();
 			SetGameOverText ("It's a draw!");
 		} else {
 			SetGameOverText(playerSide + " Wins!"); // Note the space after the first " and Wins!"
@@ -112,19 +128,25 @@ public class GameController : MonoBehaviour {
 		restartButton.SetActive(true);
 	}
 
+	void StartGame() {
+		SetBoardInteractable (true);
+		SetPlayerButtons (false);
+		startInfo.SetActive(false);
+	}
+
 	public void RestartGame()
 	{
-		playerSide = "X";
 		moveCount = 0;
 		gameOverPanel.SetActive(false);
 
-		SetBoardInteractable (true);
 		for (int i = 0; i < buttonList.Length; i++)
 		{
 			buttonList [i].text = "";
 		}
 		restartButton.SetActive(false);
-		SetPlayerColors(playerX, playerO);
+		SetPlayerButtons (true);
+		SetPlayerColorsInactive ();
+		startInfo.SetActive(true);
 	}
 
 	void SetBoardInteractable(bool toggle) {
@@ -142,5 +164,19 @@ public class GameController : MonoBehaviour {
 		newPlayer.text.color = activePlayerColor.textColor;
 		oldPlayer.panel.color = inactivePlayerColor.panelColor;
 		oldPlayer.text.color = inactivePlayerColor.textColor;
+	}
+
+	void SetPlayerButtons (bool toggle)
+	{
+		playerX.button.interactable = toggle;
+		playerO.button.interactable = toggle;  
+	}
+
+	void SetPlayerColorsInactive ()
+	{
+		playerX.panel.color = inactivePlayerColor.panelColor;
+		playerX.text.color = inactivePlayerColor.textColor;
+		playerO.panel.color = inactivePlayerColor.panelColor;
+		playerO.text.color = inactivePlayerColor.textColor;
 	}
 }
